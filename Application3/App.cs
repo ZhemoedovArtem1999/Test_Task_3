@@ -8,6 +8,8 @@ using Application3.Controller;
 using Application3.Repository.ExcelRepository;
 using Application3.ModelView;
 using Application3.Models;
+using Application3.Service;
+using System.Runtime.CompilerServices;
 
 namespace Application3
 {
@@ -17,19 +19,15 @@ namespace Application3
         {
             InputOutputConsole inputOutputConsole = new InputOutputConsole();
             OutputException exceptionOutputConsole = new OutputException();
-            string path = inputOutputConsole.Input("Введите абсолютный путь к файлу");
-            path = "D:\\Практическое задание для кандидата.xlsx";
-            if (path == null || path == "")
-            {
-                // exception кинуть            
-            }
-            Controller.Controller controller = new Controller.Controller(new ExcelProductRepository(path), new ExcelClientRepository(path), new ExcelOrderRepository(path));
+            string path = string.Empty;
+            Controller.Controller controller = App.CreateControllerInFile(inputOutputConsole, exceptionOutputConsole);
+           
             while (true) {
                 string task = inputOutputConsole.Input("Выберите действие из доступных:\n" +
                     "1 - По наименованию товара выводить информацию о клиентах, заказавших этот товар, с указанием информации по количеству товара, цене и дате заказа.\n" +
                     "2 - Запрос на изменение контактного лица клиента с указанием параметров: Название организации, ФИО нового контактного лица. В результате информация должна быть занесена в этот же документ, в качестве ответа пользователю необходимо выдавать информацию о результате изменений.\n" +
                     "3 - Запрос на определение золотого клиента, клиента с наибольшим количеством заказов, за указанный год, месяц.\n" +
-                    "4 - \n" +
+                    "4 - Изменить файл для работы\n" +
                     "5 - Выйти");
 
                 switch (task)
@@ -100,6 +98,10 @@ namespace Application3
 
                         break;
 
+                    case "4":
+                        controller = App.CreateControllerInFile(inputOutputConsole, exceptionOutputConsole);
+                        break;
+
                     case "5":
                         return;
                         
@@ -111,5 +113,40 @@ namespace Application3
                 }
             }
         }
+
+
+        private static Controller.Controller CreateControllerInFile(InputOutputConsole inputOutputConsole, OutputException outputException)
+        {
+            Controller.Controller controller = null;
+            while (true)
+            {
+                string path = inputOutputConsole.Input("Введите абсолютный путь к файлу");
+                if (path == null || path == "")
+                {
+                    outputException.Output("Путь к файлу пустой");
+                    continue;
+                }
+
+                controller = new Controller.Controller(new ExcelProductRepository(path), new ExcelClientRepository(path), new ExcelOrderRepository(path), new ValidateExcel(path, new Dictionary<string, List<string>>
+                {
+                    ["Товары"] = new List<string>() { "Код товара", "Наименование", "Ед. измерения", "Цена товара за единицу" },
+                    ["Клиенты"] = new List<string>() { "Код клиента", "Наименование организации", "Адрес", "Контактное лицо (ФИО)" },
+                    ["Заявки"] = new List<string>() { "Код заявки", "Код товара", "Код клиента", "Номер заявки", "Требуемое количество", "Дата размещения" },
+                }));
+
+                var valid = controller.ValidateFile();
+                if (valid == null)
+                    break;
+                else
+                {
+                    foreach (var item in valid.Errors)
+                    {
+                        outputException.Output(item);
+                    }
+                }
+            }
+            return controller;
+        }
+
     }
 }

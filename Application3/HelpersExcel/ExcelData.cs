@@ -27,38 +27,6 @@ namespace Application3.HelpersExcel
             Cells = new List<ExcelCell>();
         }
         public List<ExcelCell> Cells { get; set; }
-
-        public ExcelCell this[int index]
-        {
-            get
-            {
-                return Cells[index];
-            }
-            set
-            {
-                Cells[index] = value;
-            }
-        }
-
-
-        public ExcelCell this[string header]
-        {
-            get
-            {
-                var cell = GetByHeader(header);
-                return cell;
-            }
-            set
-            {
-                var cell = GetByHeader(header);
-                cell = value;
-            }
-        }
-
-        public ExcelCell GetByHeader(string header)
-        {
-            return Cells.FirstOrDefault(x => x.Header == header);
-        }
     }
 
 

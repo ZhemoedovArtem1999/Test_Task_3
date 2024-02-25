@@ -27,7 +27,6 @@ namespace Application3.Repository.ExcelRepository
         public ExcelProductRepository(string filePath)
         {
             _filePath = filePath;
-
         }
 
         private List<Product> ApplyFilter(IEnumerable<Product> entities, ProductFilter filter)
@@ -39,8 +38,6 @@ namespace Application3.Repository.ExcelRepository
 
             return entities.ToList();
         }
-
-
 
         public IEnumerable<Product> Select(ProductFilter filter)
         {
@@ -64,24 +61,7 @@ namespace Application3.Repository.ExcelRepository
                 });
             }
 
-
-            //Product product = excelDataProduct.DataRows.Select(row => new Product
-            //{
-            //    Id = int.Parse(row[_indexHeader.GetValueOrDefault(_titleHeader[0])]),
-            //    Title = (row[_indexHeader.GetValueOrDefault(_titleHeader[1])]),
-            //    Unit = (row[_indexHeader.GetValueOrDefault(_titleHeader[2])]),
-            //    Price = double.Parse(row[_indexHeader.GetValueOrDefault(_titleHeader[3])])
-
-            //}).Where(product => product.Title == filter.Title).FirstOrDefault();
-
-
             return this.ApplyFilter(products, filter);
-
-
-
         }
-
-
-
     }
 }

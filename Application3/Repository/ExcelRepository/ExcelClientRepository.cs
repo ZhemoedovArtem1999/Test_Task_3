@@ -23,7 +23,6 @@ namespace Application3.Repository.ExcelRepository
         public ExcelClientRepository(string filePath)
         {
             _filePath = filePath;
-
         }
 
         private List<Client> ApplyFilter(IEnumerable<Client> entities, ClientFilter filter)
@@ -35,7 +34,6 @@ namespace Application3.Repository.ExcelRepository
 
             return entities.ToList();
         }
-
 
         public IEnumerable<Client> Select(ClientFilter filter)
         {
@@ -52,38 +50,20 @@ namespace Application3.Repository.ExcelRepository
                 if (row[_indexHeader.GetValueOrDefault(_titleHeader[0])] != "")
                     clients.Add(new Client
                     {
-
-
                         Id = int.Parse(row[_indexHeader.GetValueOrDefault(_titleHeader[0])]),
                         OrganizationTitle = (row[_indexHeader.GetValueOrDefault(_titleHeader[1])]),
                         Address = (row[_indexHeader.GetValueOrDefault(_titleHeader[2])]),
                         ContactPerson = (row[_indexHeader.GetValueOrDefault(_titleHeader[3])]),
-
                     });
             }
 
-
-            //Product product = excelDataProduct.DataRows.Select(row => new Product
-            //{
-            //    Id = int.Parse(row[_indexHeader.GetValueOrDefault(_titleHeader[0])]),
-            //    Title = (row[_indexHeader.GetValueOrDefault(_titleHeader[1])]),
-            //    Unit = (row[_indexHeader.GetValueOrDefault(_titleHeader[2])]),
-            //    Price = double.Parse(row[_indexHeader.GetValueOrDefault(_titleHeader[3])])
-
-            //}).Where(product => product.Title == filter.Title).FirstOrDefault();
-
             return this.ApplyFilter(clients, filter);
-
-
-
-
         }
 
         public Client GetById(int id)
         {
             return this.Select(new ClientFilter() { Id = id }).FirstOrDefault();
         }
-
 
         public void UpdateClient(string organizationTitle, string newContactPerson)
         {
@@ -99,10 +79,6 @@ namespace Application3.Repository.ExcelRepository
             int columnIndexContactPerson = _indexHeader.GetValueOrDefault(_titleHeader[3]);
 
             helperExcel.UpdateExcel(_filePath, _sheetName, columnIndexOrganizationTitle, columnIndexContactPerson, organizationTitle, newContactPerson);
-
-
-
-
         }
     }
 }

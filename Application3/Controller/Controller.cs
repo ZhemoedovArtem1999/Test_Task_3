@@ -3,6 +3,7 @@ using Application3.Models;
 using Application3.ModelView;
 using Application3.Repository;
 using Application3.Repository.Filter;
+using Application3.Service;
 using Application3.Views;
 using System;
 using System.Collections.Generic;
@@ -17,11 +18,13 @@ namespace Application3.Controller
         IProductRepository _productRepository;
         IClientRepository _clientRepository;
         IOrderRepository _orderRepository;
+        IValidate _validate;
 
 
         public Controller(IProductRepository productRepository,
                             IClientRepository clientRepository,
-                            IOrderRepository orderRepository
+                            IOrderRepository orderRepository,
+                            IValidate validate
 
 
             )
@@ -29,8 +32,21 @@ namespace Application3.Controller
             _productRepository = productRepository;
             _clientRepository = clientRepository;
             _orderRepository = orderRepository;
+            _validate = validate;
 
         }
+
+        public ValidateModel ValidateFile()
+        {
+            ValidateModel valid;
+            valid = _validate.Validate();
+
+            if (!valid.IsValid)
+                return valid;
+            return null;
+
+        }
+
 
         public ClientProductView ListClients(string productTtle)
         {
@@ -63,10 +79,6 @@ namespace Application3.Controller
                 return new ClientProductView() { Status = new Status { State = 400, Message = "Неизвестное исключение. Сообщите в тех. поддержку" } };
 
             }
-
-
-
-
         }
 
         public UpdateClientView EditClient(string organizationTitle, string newContactPerson)
@@ -89,7 +101,6 @@ namespace Application3.Controller
             {
                 return new UpdateClientView { Status = new Status { State = 404, Message = "Файл не доступен" } };
             }
-
         }
 
         public GoldenClientView GetGoldenClientDate(int year, int month)
@@ -106,11 +117,12 @@ namespace Application3.Controller
                 if (ordersCountClient is null)
                     return new GoldenClientView { Status = new Status { State = 201, Message = "В выбранную дату не совершались покупки" } };
                 Client goldenClient = _clientRepository.GetById(ordersCountClient.ClientId);
-                
+
 
                 return new GoldenClientView { Status = new Status { State = 200, Message = "Успешно" }, Client = goldenClient };
             }
-            catch (IOException ex) {
+            catch (IOException ex)
+            {
                 return new GoldenClientView
                 {
                     Status = new Status
